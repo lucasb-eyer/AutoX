@@ -18,10 +18,11 @@ int main(int __attribute__((unused)) argc, char* argv[])
     Window root = DefaultRootWindow(dpy);
 
     // Not really needed, but I keep it here for quick reference.
-    int screen = DefaultScreen(dpy);
-    int width = DisplayWidth (dpy, screen);
-    int height = DisplayHeight(dpy, screen);
-    printf("Screen wxh: %d %dx%d\n", screen, width, height);
+    for(int screen = 0 ; screen < ScreenCount(dpy) ; ++screen) {
+        int width = DisplayWidth(dpy, screen);
+        int height = DisplayHeight(dpy, screen);
+        printf("Screen %d: %dx%d\n", screen, width, height);
+    }
 
     // Get the current cursor position.
     int x, y;
