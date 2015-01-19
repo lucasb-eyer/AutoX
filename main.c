@@ -6,9 +6,16 @@
 
 void querypointer(Display *dpy, Window root, int* x, int* y);
 
-int main()
+int main(int __attribute__((unused)) argc, char* argv[])
 {
     Display *dpy = XOpenDisplay(NULL);
+    if(!dpy) {
+        printf("Couldn't open display.\n"
+               " - If you're running through SSH, try `DISPLAY=localhost:0.0 %s`.\n"
+               " - If that didn't help, see http://unix.stackexchange.com/a/10126.\n", argv[0]);
+        return 1;
+    }
+
     Window root = DefaultRootWindow(dpy);
 
     // Not really needed, but I keep it here for quick reference.
