@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 
 #include <X11/Xlib.h>
 
@@ -28,7 +29,14 @@ int main(int __attribute__((unused)) argc, char* argv[])
     printf("Pre: %d,%d\n", x, y);
 
     // Jump the cursor to 10,10 for now.
-    XWarpPointer(dpy, None, root, 0, 0, 0, 0, 10, 10);
+    if(!isatty(STDIN_FILENO)) {
+        if(2 != scanf("%d %d", &x, &y)) {
+            printf("Error in your input!\n");
+            return 1;
+        }
+    } else
+        x = y = 10;
+    XWarpPointer(dpy, None, root, 0, 0, 0, 0, x, y);
     XFlush(dpy);
 
     // Check if the jump did really happen?
