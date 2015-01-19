@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include <X11/Xlib.h>
 
@@ -48,6 +46,6 @@ void querypointer(Display *dpy, Window w, int* x, int* y)
     int _win_x, _win_y;
     unsigned int _mask;
     if(!XQueryPointer(dpy, w, &_root, &_child, x, y, &_win_x, &_win_y, &_mask)) {
-        puts("Couldn't query pointer?");
+        printf("Couldn't query pointer?\n");
     }
 }
