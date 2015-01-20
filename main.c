@@ -11,7 +11,8 @@ int main(int __attribute__((unused)) argc, char* argv[])
 {
     Display *dpy = XOpenDisplay(NULL);
     if(!dpy) {
-        printf("Couldn't open display.\n"
+        fprintf(stderr,
+               "Couldn't open display.\n"
                " - If you're running through SSH, try `DISPLAY=localhost:0.0 %s`.\n"
                " - If that didn't help, see http://unix.stackexchange.com/a/10126.\n", argv[0]);
         return 1;
@@ -34,7 +35,7 @@ int main(int __attribute__((unused)) argc, char* argv[])
     // Jump the cursor to 10,10 for now.
     if(!isatty(STDIN_FILENO)) {
         if(3 != scanf("%d %d %d", &x, &y, &button)) {
-            printf("Error in your input! It should be three integers: x y click\n");
+            fprintf(stderr, "Error in your input! It should be three integers: x y click\n");
             return 1;
         }
     } else
@@ -61,9 +62,8 @@ void querypointer(Display *dpy, Window w, int* x, int* y)
     Window _root, _child;
     int _win_x, _win_y;
     unsigned int _mask;
-    if(!XQueryPointer(dpy, w, &_root, &_child, x, y, &_win_x, &_win_y, &_mask)) {
-        printf("Couldn't query pointer?\n");
-    }
+    if(!XQueryPointer(dpy, w, &_root, &_child, x, y, &_win_x, &_win_y, &_mask))
+        fprintf(stderr, "Couldn't query pointer?\n");
 }
 
 void click(Display *dpy, Window w, int button)
@@ -82,11 +82,11 @@ void click(Display *dpy, Window w, int button)
     }
 
     if(XSendEvent(dpy, PointerWindow, True, 0xfff, &event) == 0)
-        printf("Couldn't send ButtonPress event?\n");
+        fprintf(stderr, "Couldn't send ButtonPress event?\n");
     XFlush(dpy);
 
     event.type = ButtonRelease;
     if(XSendEvent(dpy, PointerWindow, True, 0xfff, &event) == 0)
-        printf("Couldn't send ButtonRelease event?\n");
+        fprintf(stderr, "Couldn't send ButtonRelease event?\n");
     XFlush(dpy);
 }
