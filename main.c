@@ -1,9 +1,11 @@
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <X11/Xlib.h>
 
 void querypointer(Display *dpy, Window root, int* x, int* y);
+void click(Display* dpy, Window root, int button);
 
 int main(int __attribute__((unused)) argc, char* argv[])
 {
@@ -40,6 +42,8 @@ int main(int __attribute__((unused)) argc, char* argv[])
     XWarpPointer(dpy, None, root, 0, 0, 0, 0, x, y);
     XFlush(dpy);
 
+    click(dpy, root, Button1);
+
     // Check if the jump did really happen?
     querypointer(dpy, root, &x, &y);
     printf("Post: %d,%d\n", x, y);
@@ -57,4 +61,29 @@ void querypointer(Display *dpy, Window w, int* x, int* y)
     if(!XQueryPointer(dpy, w, &_root, &_child, x, y, &_win_x, &_win_y, &_mask)) {
         printf("Couldn't query pointer?\n");
     }
+}
+
+void click(Display *dpy, Window w, int button)
+{
+    XEvent event;
+    memset(&event, 0, sizeof(event));
+    event.type = ButtonPress;
+    event.xbutton.button = button;
+    event.xbutton.same_screen = True;
+
+    // Find out the actual window (i.e. widget) the mouse is on. The event needs it!
+    event.xbutton.subwindow = w;
+    while(event.xbutton.subwindow) {
+        event.xbutton.window = event.xbutton.subwindow;
+        XQueryPointer(dpy, event.xbutton.window, &event.xbutton.root, &event.xbutton.subwindow, &event.xbutton.x_root, &event.xbutton.y_root, &event.xbutton.x, &event.xbutton.y, &event.xbutton.state);
+    }
+
+    if(XSendEvent(dpy, PointerWindow, True, 0xfff, &event) == 0)
+        printf("Couldn't send ButtonPress event?\n");
+    XFlush(dpy);
+
+    event.type = ButtonRelease;
+    if(XSendEvent(dpy, PointerWindow, True, 0xfff, &event) == 0)
+        printf("Couldn't send ButtonRelease event?\n");
+    XFlush(dpy);
 }
