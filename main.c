@@ -27,14 +27,14 @@ int main(int __attribute__((unused)) argc, char* argv[])
     }
 
     // Get the current cursor position.
-    int x, y;
+    int x, y, button = 1;
     querypointer(dpy, root, &x, &y);
     printf("Pre: %d,%d\n", x, y);
 
     // Jump the cursor to 10,10 for now.
     if(!isatty(STDIN_FILENO)) {
-        if(2 != scanf("%d %d", &x, &y)) {
-            printf("Error in your input!\n");
+        if(3 != scanf("%d %d %d", &x, &y, &button)) {
+            printf("Error in your input! It should be three integers: x y click\n");
             return 1;
         }
     } else
@@ -42,7 +42,10 @@ int main(int __attribute__((unused)) argc, char* argv[])
     XWarpPointer(dpy, None, root, 0, 0, 0, 0, x, y);
     XFlush(dpy);
 
-    click(dpy, root, Button1);
+    if(button) {
+        printf("Clicking button %d\n", button);
+        click(dpy, root, button);
+    }
 
     // Check if the jump did really happen?
     querypointer(dpy, root, &x, &y);
